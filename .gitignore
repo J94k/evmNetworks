@@ -1,0 +1,6 @@
+logs.txt
+node_modules
+*lock.json
+networks.json
+sources.json
+.env
