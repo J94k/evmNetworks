@@ -99,7 +99,7 @@ async function init() {
     if (!!diff.length) {
       await saveInfo(DIFF_FILE, JSON.stringify(diff), "w+");
       await saveInfo(NETWORKS_FILE, JSON.stringify(newNetworks), "w+");
-      await sendInfo(JSON.stringify(diff));
+      await sendInfo(JSON.stringify(diff, undefined, 4));
     }
   }
 

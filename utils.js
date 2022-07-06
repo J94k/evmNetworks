@@ -6,7 +6,7 @@ const { TELEGRAM_API, BOT_KEY, CHAT_ID } = config.parsed;
 const LOG_FILE = "./logs.txt";
 
 async function sendInfo(message) {
-  if (!TELEGRAM_API || !BOT_KEY || CHAT_ID) {
+  if (!TELEGRAM_API || !BOT_KEY || !CHAT_ID) {
     return;
   }
 
