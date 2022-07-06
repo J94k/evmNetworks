@@ -81,7 +81,7 @@ async function createSourcesList() {
       }
     }
 
-    await saveInfo(SOURCES_FILE, JSON.stringify(sources));
+    await saveInfo(SOURCES_FILE, JSON.stringify(sources), "w+");
   } catch (error) {
     console.error("Error in sources list management");
   }
@@ -92,13 +92,13 @@ async function init() {
   const newNetworks = await fetchNetworksInfo();
 
   if (!oldNetworks?.length) {
-    await saveInfo(NETWORKS_FILE, JSON.stringify(newNetworks));
+    await saveInfo(NETWORKS_FILE, JSON.stringify(newNetworks), "w+");
   } else {
     const diff = difference(oldNetworks, newNetworks);
 
     if (!!diff.length) {
       await saveInfo(DIFF_FILE, JSON.stringify(diff), "w+");
-      await saveInfo(NETWORKS_FILE, JSON.stringify(newNetworks));
+      await saveInfo(NETWORKS_FILE, JSON.stringify(newNetworks), "w+");
       await sendInfo(JSON.stringify(diff));
     }
   }
@@ -106,4 +106,4 @@ async function init() {
   await createSourcesList();
 }
 
-// init();
+init();

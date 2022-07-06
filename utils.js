@@ -6,6 +6,10 @@ const { TELEGRAM_API, BOT_KEY, CHAT_ID } = config.parsed;
 const LOG_FILE = "./logs.txt";
 
 async function sendInfo(message) {
+  if (!TELEGRAM_API || !BOT_KEY || CHAT_ID) {
+    return;
+  }
+
   try {
     const request = `${TELEGRAM_API}${BOT_KEY}/sendMessage?chat_id=${CHAT_ID}&text=${message}`;
     const { status, data } = await axios.post(request);
