@@ -1,8 +1,8 @@
 const config = require("dotenv").config();
 const fs = require("fs");
 const axios = require("axios");
-
 const { TELEGRAM_API, BOT_KEY, CHAT_ID } = config.parsed;
+
 const LOG_FILE = "./logs.txt";
 
 async function sendInfo(message) {
@@ -11,7 +11,6 @@ async function sendInfo(message) {
     const { status, data } = await axios.post(request);
 
     if (status !== 200) {
-      console.log("write");
       await saveInfo(
         LOG_FILE,
         JSON.stringify({
@@ -45,7 +44,7 @@ async function saveInfo(file, content, flag = "a+") {
         return error ? reject(error) : resolve(true);
       });
     } catch (error) {
-      console.warn("Cannot save info");
+      console.warn("CANNOT SAVE");
       console.error(error);
       reject(error);
     }
@@ -55,11 +54,19 @@ async function saveInfo(file, content, flag = "a+") {
 async function readInfo(file) {
   return new Promise((resolve, reject) => {
     try {
+      if (!fs.existsSync(file)) return resolve(false);
+
       const rawData = fs.readFileSync(file);
 
-      resolve(JSON.parse(rawData));
+      try {
+        const data = JSON.parse(rawData);
+
+        resolve(data);
+      } catch (error) {
+        resolve(false);
+      }
     } catch (error) {
-      console.warn("Cannot save info");
+      console.warn("CANNOT READ");
       console.error(error);
       reject(error);
     }
@@ -75,19 +82,27 @@ function sortNetworks(networks) {
 */
 function difference(net1, net2) {
   try {
-    if (net1.length >= net2.length) return [];
-    if (!net1.length) return net2;
-
     const diff = [];
 
-    for (let i = 0; i < net1.length; i += 1) {
-      const n1 = net1[i];
-      const n2 = net2[i];
+    if (net1.length >= net2.length) return diff;
 
-      if (n1.chainId !== n2.chainId) {
-        diff.push(n2);
-        diff.push(...difference(net1.slice(i), net2.slice(i + 1)));
-        break;
+    if (!net1.length) return net2;
+
+    if (net1.length === 1) {
+      const remaningOfNet2 = net1[0].chainId === net2[0].chainId;
+      const net = remaningOfNet2 ? net2.slice(1) : net2;
+
+      diff.push(...net);
+    } else {
+      for (let i = 0; i < net1.length; i += 1) {
+        const n1 = net1[i];
+        const n2 = net2[i];
+
+        if (n1.chainId !== n2.chainId) {
+          diff.push(n2);
+          diff.push(...difference(net1.slice(i), net2.slice(i + 1)));
+          break;
+        }
       }
     }
 
@@ -134,7 +149,7 @@ async function isRpcAlive(rpcArr) {
           return true;
         }
       } catch (error) {
-        console.log("Problem with RPC. Skip:", endpoint);
+        console.error("Problem with RPC. Skip:", endpoint);
         continue;
       }
     }
@@ -148,7 +163,7 @@ async function isRpcAlive(rpcArr) {
 
 async function timeout(ms) {
   return new Promise((res) => {
-    setTimeout(() => res(true), [ms]);
+    setTimeout(() => res(true), ms);
   });
 }
 

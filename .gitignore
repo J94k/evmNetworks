@@ -1,6 +1,7 @@
 logs.txt
 node_modules
 *lock.json
-networks.json
-sources.json
+*networks.json
+*sources.json
+diff.json
 .env

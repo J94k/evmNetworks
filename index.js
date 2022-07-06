@@ -1,5 +1,4 @@
 const config = require("dotenv").config();
-const fs = require("fs");
 const {
   sendInfo,
   readInfo,
@@ -13,6 +12,7 @@ const {
 const { NETWORKS_ENDPOINT } = config.parsed;
 const NETWORKS_FILE = "./networks.json";
 const SOURCES_FILE = "./sources.json";
+const DIFF_FILE = "./diff.json";
 const excludedIds = [
   1, 3, 4, 56, 97, 137, 5, 6, 10, 25, 180, 43114, 250, 122, 1285, 1666600000,
   1313161554, 200, 42161,
@@ -63,6 +63,9 @@ async function fetchNetworksInfo() {
 async function createSourcesList() {
   try {
     const networks = await readInfo(NETWORKS_FILE);
+
+    if (!networks) return;
+
     const sources = [];
 
     for (let i = 0; i < networks.length; i += 1) {
@@ -84,25 +87,23 @@ async function createSourcesList() {
   }
 }
 
-async function checkDifference() {
-  const net1 = await readInfo(NETWORKS_FILE);
-  const net2 = await fetchNetworksInfo();
+async function init() {
+  const oldNetworks = await readInfo(NETWORKS_FILE);
+  const newNetworks = await fetchNetworksInfo();
 
-  const diff = difference(net1, net2);
+  if (!oldNetworks?.length) {
+    await saveInfo(NETWORKS_FILE, JSON.stringify(newNetworks));
+  } else {
+    const diff = difference(oldNetworks, newNetworks);
 
-  if (diff.length) {
-    sendInfo(JSON.stringify(diff));
+    if (!!diff.length) {
+      await saveInfo(DIFF_FILE, JSON.stringify(diff), "w+");
+      await saveInfo(NETWORKS_FILE, JSON.stringify(newNetworks));
+      await sendInfo(JSON.stringify(diff));
+    }
   }
 
-  await saveInfo(NETWORKS_FILE, sortedNet2);
-}
-
-async function init() {
-  const networks = fetchNetworksInfo();
-
-  await saveInfo(NETWORKS_FILE, JSON.stringify(networks));
+  await createSourcesList();
 }
 
 // init();
-// fetchNetworksInfo();
-// createSourcesList();
