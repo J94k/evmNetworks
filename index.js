@@ -87,7 +87,7 @@ async function createSourcesList() {
   }
 }
 
-async function init() {
+async function update() {
   const oldNetworks = await readInfo(NETWORKS_FILE);
   const newNetworks = await fetchNetworksInfo();
 
@@ -106,4 +106,6 @@ async function init() {
   await createSourcesList();
 }
 
-init();
+exports.modules = {
+  update,
+};

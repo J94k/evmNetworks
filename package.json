@@ -2,9 +2,11 @@
   "name": "evm-networks",
   "version": "0.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "update.js",
   "scripts": {
-    "update": "node index.js"
+    "update": "node update.js",
+    "start": "node job.js",
+    "test": "node test.js"
   },
   "keywords": [],
   "author": "",
